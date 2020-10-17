@@ -1,0 +1,13 @@
+docker pull mysql
+docker run -d --name swingy --restart on-failure -e MYSQL_ROOT_PASSWORD=nimfa -e MYSQL_DATABASE=swingy -p 3306:3306 mysql
+docker pull phpmyadmin/phpmyadmin
+docker run --name myadmin -d --restart on-failure --link swingy:db -p 8080:80 phpmyadmin/phpmyadmin
+
+## export database from docker container
+docker exec swingy /usr/bin/mysqldump -u root --password=nimfa swingy > swingy.sql
+
+##restore
+cat swingy.sql | docker exec -i swingy /usr/bin/mysql -u root --password=nimfa swingy
+
+open:
+http://localhost:8080
